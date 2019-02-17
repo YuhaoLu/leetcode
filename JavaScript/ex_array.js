@@ -8,8 +8,8 @@ arr.unshift(0);
 arr.shift();
 
 // Copy
-var arr = [0, 1, 2, 3, 4];
-var arr2 = arr.slice(1, 4);
+var arr = [0, 1, 2, 3, 4]; 
+var arr2 = arr.slice(1); // (beginIndex[, endIndex])
 console.log(arr2); // ===> [1, 2, 3]
 
 // Add / Delete
