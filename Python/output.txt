@@ -1,0 +1,49 @@
+Experiment: USCEE533/lab2-ee533-yuhaolu
+State: active
+
+Virtual Node Info:
+ID              Type         OS              Qualified Name
+--------------- ------------ --------------- --------------------
+nodeA           pc                           nodeA.lab2-ee533-yuhaolu.USCEE533.isi.deterlab.net
+nodeB           pc                           nodeB.lab2-ee533-yuhaolu.USCEE533.isi.deterlab.net
+
+Physical Node Mapping:
+ID              Type         OS              Physical
+--------------- ------------ --------------- ------------
+nodeA           pc3060       Ubuntu1604-STD  pc174
+nodeB           pc3060       Ubuntu1604-STD  pc186
+
+Virtual Lan/Link Info:
+ID              Member/Proto    IP/Mask         Delay     BW (Kbs)  Loss Rate
+--------------- --------------- --------------- --------- --------- ---------
+lan0            nodeA:0         10.1.1.2        0         100000    0
+                ethernet        255.255.255.0   0         100000    0
+lan0            nodeB:0         10.1.1.3        0         100000    0
+                ethernet        255.255.255.0   0         100000    0
+
+Physical Lan/Link Mapping:
+ID              Member          IP              MAC                  NodeID
+--------------- --------------- --------------- -------------------- ---------
+lan0            nodeA:0         10.1.1.2        00:04:23:c5:d5:61    pc174
+                                                3/1 <-> 5/12         EHP17e
+lan0            nodeB:0         10.1.1.3        00:04:23:c5:e3:6a    pc186
+                                                0/1 <-> 5/15         EHP17e
+
+Virtual Queue Info:
+ID              Member          Q Limit    Type    weight/min_th/max_th/linterm
+--------------- --------------- ---------- ------- ----------------------------
+lan0            nodeA:0         100 slots  Tail    0/0/0/0
+lan0            nodeB:0         100 slots  Tail    0/0/0/0
+
+Event Groups:
+Group Name      Members
+--------------- ---------------------------------------------------------------
+__all_tracemon  lan0-nodeA-tracemon,lan0-nodeB-tracemon
+lan0-tracemon   lan0-nodeA-tracemon,lan0-nodeB-tracemon
+__all_lans      lan0
+
+Event Summary:
+--------------
+Event count: 1
+First event: 0 seconds
+Last event: 0 seconds

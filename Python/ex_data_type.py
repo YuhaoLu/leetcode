@@ -1,5 +1,3 @@
-from pprint import pprint
-
 def test_list():
     li = ['1', '2', '3']
     print(li)
@@ -41,6 +39,7 @@ def test_list():
     del li2[2:4]
     print(li2)
 
+
 def test_deque():
 
     from collections import deque
@@ -53,6 +52,7 @@ def test_deque():
 
     print(queue.popleft())
     print(queue)
+
 
 def test_list_comprehensions():
     li = [(x, y) 
@@ -75,6 +75,7 @@ def test_list_comprehensions():
     ]
     print(transposed)
 
+
 def test_set():
     basket = {'apple', 'orange', 'apple', 'pear', 'orange', 'banana'}
     print(basket)
@@ -95,6 +96,7 @@ def test_set():
     set_c = {x for x in 'abracadabra' if x not in 'abc'}
     print(set_c)
 
+
 def test_dict():
     tel = {'jack': 4098, 'sape': 4139}
     tel['guido'] = 4127
@@ -102,16 +104,21 @@ def test_dict():
     
     del tel['sape']
     print(tel)
+    
+    tel_patch = {'guido': 1248, 'bruce': 9999}
+    tel.update(tel_patch)
+    print(tel)
 
     print(list(tel))
     print(sorted(tel))
 
     print('guido' in tel)
     print('jack' not in tel)
-
+    
     # dict comprehensions
     dict2 = {x: x**2 for x in (2, 4, 6)}
     print(dict2)
+
 
 def test_looping():
     # loop through dict
@@ -142,12 +149,28 @@ def test_looping():
     basket = ['apple', 'orange', 'apple', 'pear', 'orange', 'banana']
     for f in sorted(set(basket)):
         print(f)
-        
+
+
+def test_comparison():
+    result = 1 < 2 == 2
+    print(result)
+
+    # Comparing Sequences
+    # (1, 2, 3) < (1, 2, 4)
+    # [1, 2, 3] < [1, 2, 4]
+    # 'ABC' < 'C' < 'Pascal' < 'Python'
+    # (1, 2, 3, 4) < (1, 2, 4)
+    # (1, 2) < (1, 2, -1)
+    # (1, 2, 3) == (1.0, 2.0, 3.0)
+    # (1, 2, ('aa', 'ab')) < (1, 2, ('abc', 'a'), 4)
+
+
 if __name__ == "__main__":
     # test_list()
     # test_deque()
     # test_list_comprehensions()
     # test_set()
-    # test_dict()
-    test_looping()
+    test_dict()
+    # test_looping()
+    # test_comparison()
     pass
