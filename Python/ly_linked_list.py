@@ -131,15 +131,12 @@ class LinkedList(object):
             node = self.get_next(node)
         return None
     
-    def traverse(self, func):
+    def gen_traverse(self):
         node = self.get_head()
         while node is not None:
-            func(node.val)
+            yield node.val
             node = self.get_next(node)
 
-
-def f(x):
-    print(x, )
 
 def test_LinkedList():
     # Create Linked List
@@ -148,8 +145,9 @@ def test_LinkedList():
     linked_li.append(2)
     linked_li.append(3)
     print(linked_li)
-    
-    print(linked_li.traverse(f))
+
+    for node in linked_li.gen_traverse():
+        print(node)
 
     # test prepend(), append()
     linked_li.prepend(0)
@@ -165,7 +163,7 @@ def test_LinkedList():
     print(node_tail)
     print(node_1)
     print(node_2, '\n')
-    
+        
     # test insert_before(), insert_after()
     node_a = LNode('a')
     node_b = LNode('b')
@@ -179,6 +177,7 @@ def test_LinkedList():
     print(linked_li)
     linked_li.unlink_all()
     print(repr(linked_li))
+
 
 if __name__ == "__main__":
     test_LinkedList()
