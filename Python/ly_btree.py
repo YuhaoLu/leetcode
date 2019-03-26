@@ -1,16 +1,16 @@
 class TNode(object):
 
-    def __init__(self, key=None, **kwarg):
+    def __init__(self, key=None, val=None):
         self.key = key
-        self.data = kwarg
+        self.val = val
         
         self.left = None
         self.right = None
         self.parent = None
         
     def __repr__(self):
-        return "{{key: {}, parent: {}, left: {}, right: {}, data: {}}}" \
-            .format(self.key, self.parent, self.left, self.right,  self.data)
+        return "{{ key: {}, parent: {}, left: {}, right: {}, val: {} }}" \
+            .format(self.key, self.parent, self.left, self.right, repr(self.val))
 
     def __str__(self):
         return str(self.key)
@@ -46,15 +46,15 @@ class TNode(object):
             self.key = key_pair[0]
         elif len(key_pair) == 2:
             self.key = key_pair[0]
-            self.data.update(**key_pair[1])
+            self.val = key_pair[1]
         else:
-            raise Exception("Invalid key_pair {}".format(key_pair))
+            raise Exception("Invalid key_pair: {}".format(key_pair))
     
     @classmethod
     def init_key_pair(cls, key_pair):
         """ 
         Use @classmethod for multiple constructor
-        Create a TNode with key_pair[key, {'payload': 'Hello'}]
+        Create a TNode with key_pair[key, val]
         if key_pair == None, return None
         """
         if key_pair is None:
@@ -62,23 +62,24 @@ class TNode(object):
         elif len(key_pair) == 1:
             tnode = cls(key_pair[0])
         elif len(key_pair) == 2:
-            tnode = cls(key_pair[0], **key_pair[1])
+            tnode = cls(key_pair[0], key_pair[1])
         else:
-            raise Exception("Invalid key_pair {}".format(key_pair))
+            raise Exception("Invalid key_pair: {}".format(key_pair))
         return tnode
 
 
 class BiTree(object):
 
-    def __init__(self, li_key_pair=None):
+    def __init__(self, li_key_pair=None, TNodeType=TNode):
         """ 
-        BiTree can be initialized with a list of key_pair[key, {'payload': 'Hello'}]
+        BiTree can be initialized with a list of key_pair[key, val]
         """
         self.root = None
         self.size = 0
+        self.TNodeType = TNodeType
 
         if li_key_pair is not None:
-            li_tnode = [TNode.init_key_pair(key_pair) for key_pair in li_key_pair ]
+            li_tnode = [self.TNodeType.init_key_pair(key_pair) for key_pair in li_key_pair ]
 
             for index in range(1, len(li_tnode) + 1):
                 tnode = li_tnode[index-1]  # index - tnode
@@ -149,7 +150,7 @@ class BiTree(object):
             while len(right_lines) < len(left_lines):
                 right_lines.append(' ' * right_width)
 
-            label = str(node.key)
+            label = str(node)
             middle = max(right_pos + left_width - left_pos + 1, len(label), 2)
 
             """ Padding the label(the string of node.val) with '.'s """
@@ -226,7 +227,7 @@ class BiTree(object):
 
     def __getitem__(self, i):
         """
-        bitree[i] 
+        bitree[i] -> tnode
         - returns node at index i
         - if it doen't exist, return None
         """
@@ -261,7 +262,7 @@ class BiTree(object):
         bitree[i] = [key, {'payload': 'Hello'}] or None
 
         bitree[i] exist 
-        - update bitree[i]'s key and data
+        - update bitree[i]'s key and val
         - if key_pair is None, delete bitree[i] if possible
 
         bitree[i] doesn't exist
@@ -275,7 +276,7 @@ class BiTree(object):
                 del self[i]
         else:                  # node[i] doesn't exist
             if key_pair is not None:
-                tnode_new = TNode.init_key_pair(key_pair)
+                tnode_new = self.TNodeType.init_key_pair(key_pair)
                 tnode_parent = self[i // 2]
                 if tnode_parent is not None:  # node[i]'s parent exist
                     tnode_new.parent = tnode_parent
@@ -287,33 +288,37 @@ class BiTree(object):
                     raise Exception("node[{}]'s ancestor doesn't exist".format(i))
                 self.size += 1
 
+    def detach(self, tnode):
+        child_stat = tnode.child_stat()
+        if child_stat == 'none':
+            tnode_replace = None
+        elif child_stat == 'left':
+            tnode_replace = tnode.left
+        elif child_stat == 'right':
+            tnode_replace = tnode.right
+        elif child_stat == 'both':
+            raise Exception("Node cannot be detached because it has both child")
+
+        locate = tnode.locate()
+        if locate == 'root':
+            self.root = tnode_replace
+        elif locate == 'left':
+            tnode.parent.left = tnode_replace
+        elif locate == 'right':
+            tnode.parent.right = tnode_replace
+        
+        if tnode_replace is not None:
+            tnode_replace.parent = tnode.parent
+        self.size -= 1
+
     def __delitem__(self, i):
         """
         del bitree[i]
         """
         tnode = self[i]
         if tnode is not None:
-            child_stat = tnode.child_stat()
-            if child_stat == 'none':
-                tnode_replace = None
-            elif child_stat == 'left':
-                tnode_replace = tnode.left
-            elif child_stat == 'right':
-                tnode_replace = tnode.right
-            elif child_stat == 'both':
-                raise "node[{}] cannot be deleted because it has both child"
-
-            locate = tnode.locate()
-            if locate == 'root':
-                self.root = tnode_replace
-            elif locate == 'left':
-                tnode.parent.left = tnode_replace
-            elif locate == 'right':
-                tnode.parent.right = tnode_replace
-            if tnode_replace is not None:
-                tnode_replace.parent = tnode.parent
-            self.size -= 1
-
+            self.detach(tnode)
+        
 
 def decor_name(func):
     def wrapper(*args, **kwarg):
@@ -333,13 +338,13 @@ def bprint(*data):
 
 def test_bitree():
 
-    btree = BiTree([[1, {'payload': 'D'}],
-                    [2, {'payload': 'B'}],
-                    [3, {'payload': 'E'}],
-                    [4, {'payload': 'A'}],
-                    [5, {'payload': 'C'}],
+    btree = BiTree([[1, 'D'],
+                    [2, 'B'],
+                    [3, 'E'],
+                    [4, 'A'],
+                    [5, 'C'],
                     None,
-                    [7, {'payload': 'F'}]
+                    [7, 'F']
                     ])
 
     @decor_name
@@ -347,7 +352,7 @@ def test_bitree():
         bprint(btree)
         bprint(repr(btree))
         bprint("btree size:", len(btree))
-    # test_init()
+    test_init()
 
     @decor_name
     def test_getitem():
@@ -357,19 +362,19 @@ def test_bitree():
         bprint(repr(btree[6]))
         bprint(repr(btree[7]))
         bprint(repr(btree[20]))
-    # test_getitem()
+    test_getitem()
 
     @decor_name
     def test_setitem():
-        btree[1] = [11, {'payload': 'DD'}]
+        btree[1] = [11, 'DD']
         bprint(repr(btree))
-        btree[4] = [44, {'payload': 'haha'}]
+        btree[4] = [44, 'haha']
         bprint(repr(btree))
-        btree[9] = [99, {'payload': 'hello'}]
+        btree[9] = [99, 'hello']
         bprint(repr(btree))
         btree[7] = None
         bprint(repr(btree))
-    # test_setitem()
+    test_setitem()
 
     @decor_name
     def test_delitem():
@@ -381,16 +386,16 @@ def test_bitree():
         del btree[4]
         del btree[7]
         del btree[2]
-        del btree[1]
+        # del btree[1]
         bprint(repr(btree))
     test_delitem()
 
     @decor_name
     def test_find():
+        bprint(repr(btree.find(11)))
         bprint(repr(btree.find(1)))
-        bprint(repr(btree.find(6)))
-        bprint(repr(btree.find(7)))
-    # test_find()
+        bprint(repr(btree.find(3)))
+    test_find()
 
 
 if __name__ == "__main__":
